@@ -296,11 +296,7 @@ class GitPackageManagementBuildPackageProcessor extends modObjectProcessor {
             /** @var modCategory $category */
             $category = $this->modx->newObject('modCategory');
             $category->set('category', $cat->getName());
-
-            $rank = $category->getRank();
-            if (!empty($rank)) {
-                $category->set('rank', $rank);
-            }
+            $category->set('rank', $cat->getRank());
 
             $snippets = $this->getSnippets($cat->getName());
             if (!empty($snippets)) {
