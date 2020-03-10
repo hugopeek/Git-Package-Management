@@ -463,11 +463,26 @@ class GitPackageManagementBuildPackageProcessor extends modObjectProcessor {
                 if (count($events) > 0) {
                     $eventObjects = array();
                     foreach ($events as $event) {
-                        $eventObjects[$event] = $this->modx->newObject('modPluginEvent');
-                        $eventObjects[$event]->fromArray(array(
-                            'event' => $event,
-                            'priority' => 0,
-                            'propertyset' => 0
+                        $eventName = $event;
+                        $priority = 0;
+                        $propertySet = 0;
+
+                        // If events are defined as separate JSON objects, they can contain priority and propertyset values
+                        if (is_array($event)) {
+                            $eventName = $event['event'];
+                            if ($event['priority']) {
+                                $priority = $event['priority'];
+                            }
+                            if ($event['propertyset']) {
+                                $propertySet = $event['propertyset'];
+                            }
+                        }
+
+                        $eventObjects[$eventName] = $this->modx->newObject('modPluginEvent');
+                        $eventObjects[$eventName]->fromArray(array(
+                            'event' => $eventName,
+                            'priority' => $priority,
+                            'propertyset' => $propertySet,
                         ), '', true, true);
                     }
 
