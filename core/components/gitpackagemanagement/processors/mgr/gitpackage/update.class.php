@@ -426,7 +426,7 @@ class GitPackageManagementUpdatePackageProcessor extends modObjectUpdateProcesso
                 $oldTemplate->remove();
             }
 
-            $tvObject->setProperties($tvObject->getProperties());
+            $tvObject->setProperties($tv->getProperties());
             $tvObject->save();
 
             $templates = $tv->getTemplates();
