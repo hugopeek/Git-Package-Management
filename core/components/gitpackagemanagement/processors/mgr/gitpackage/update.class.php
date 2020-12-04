@@ -384,15 +384,9 @@ class GitPackageManagementUpdatePackageProcessor extends modObjectUpdateProcesso
             $templateList[$template->get('templatename')] = $template->get('id');
         }
 
-        //$this->modx->log(modX::LOG_LEVEL_ERROR, print_r($templateList,1));
-        //$total = microtime(true);
-
         /** @var GitPackageConfigElementTV $tv */
         foreach($this->newConfig->getElements('tvs') as $name => $tv){
             /** @var modTemplateVar $tvObject */
-
-            //$tstart = microtime(true);
-            //$this->modx->log(modX::LOG_LEVEL_ERROR, $tv->getName());
 
             $tvObject = $this->modx->getObject('modTemplateVar', array('name' => $name));
 
@@ -434,14 +428,8 @@ class GitPackageManagementUpdatePackageProcessor extends modObjectUpdateProcesso
                 $tvObject->set('output_properties',$outputProperties);
             }
 
-//            $timer = number_format(round(microtime(true) - $tstart, 7), 7);
-//            $this->modx->log(modX::LOG_LEVEL_ERROR, $timer);
-
             /** @var modTemplateVarTemplate[] $oldTemplates */
             $oldTemplates = $tvObject->getMany('TemplateVarTemplates');
-
-//            $timer = number_format(round(microtime(true) - $tstart, 7), 7);
-//            $this->modx->log(modX::LOG_LEVEL_ERROR, $timer);
 
             $tvObject->setProperties($tv->getProperties());
             $tvObject->save();
@@ -464,9 +452,7 @@ class GitPackageManagementUpdatePackageProcessor extends modObjectUpdateProcesso
             $addedTemplates = array_diff($newTemplateList, $oldTemplateList);
             $removedTemplates = array_diff($oldTemplateList, $newTemplateList);
 
-//            $this->modx->log(modX::LOG_LEVEL_ERROR, 'Added templates: ' . print_r($addedTemplates,1));
-//            $this->modx->log(modX::LOG_LEVEL_ERROR, 'Removed templates: ' . print_r($removedTemplates,1));
-
+            // Add / remove the differences
             foreach ($addedTemplates as $template) {
                 $this->modx->log(modX::LOG_LEVEL_ERROR, 'Add template: ' . $template);
                 $templateTVObject = $this->modx->newObject('modTemplateVarTemplate');
@@ -486,9 +472,6 @@ class GitPackageManagementUpdatePackageProcessor extends modObjectUpdateProcesso
             if(isset($notUsedElements[$name])){
                 unset($notUsedElements[$name]);
             }
-
-//            $timer = number_format(round(microtime(true) - $tstart, 7), 7);
-//            $this->modx->log(modX::LOG_LEVEL_ERROR, $timer);
         }
 
         foreach($notUsedElements as $name => $value){
@@ -499,9 +482,6 @@ class GitPackageManagementUpdatePackageProcessor extends modObjectUpdateProcesso
                 $tv->remove();
             }
         }
-
-//        $totalEnd = number_format(round(microtime(true) - $total, 7), 7);
-//        $this->modx->log(modX::LOG_LEVEL_ERROR, $totalEnd);
 
         return true;
     }
