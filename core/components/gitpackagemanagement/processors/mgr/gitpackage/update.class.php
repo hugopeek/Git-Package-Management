@@ -376,9 +376,24 @@ class GitPackageManagementUpdatePackageProcessor extends modObjectUpdateProcesso
         $notUsedElements = array_keys($this->oldConfig->getElements('tvs'));
         $notUsedElements = array_flip($notUsedElements);
 
+        // Create reference array with template names and IDs
+        $templateList = array();
+        $allTemplates = $this->modx->getCollection('modTemplate');
+
+        foreach ($allTemplates as $template) {
+            $templateList[$template->get('templatename')] = $template->get('id');
+        }
+
+        //$this->modx->log(modX::LOG_LEVEL_ERROR, print_r($templateList,1));
+        //$total = microtime(true);
+
         /** @var GitPackageConfigElementTV $tv */
         foreach($this->newConfig->getElements('tvs') as $name => $tv){
             /** @var modTemplateVar $tvObject */
+
+            //$tstart = microtime(true);
+            //$this->modx->log(modX::LOG_LEVEL_ERROR, $tv->getName());
+
             $tvObject = $this->modx->getObject('modTemplateVar', array('name' => $name));
 
             if (!$tvObject){
@@ -408,7 +423,7 @@ class GitPackageManagementUpdatePackageProcessor extends modObjectUpdateProcesso
             $tvObject->set('rank', $tv->getSortOrder());
             $tvObject->set('default_text', $tv->getDefaultValue());
             $tvObject->set('display', $tv->getDisplay());
-            
+
             $inputProperties = $tv->getInputProperties();
             if (!empty($inputProperties)) {
                 $tvObject->set('input_properties',$inputProperties);
@@ -419,30 +434,61 @@ class GitPackageManagementUpdatePackageProcessor extends modObjectUpdateProcesso
                 $tvObject->set('output_properties',$outputProperties);
             }
 
+//            $timer = number_format(round(microtime(true) - $tstart, 7), 7);
+//            $this->modx->log(modX::LOG_LEVEL_ERROR, $timer);
+
             /** @var modTemplateVarTemplate[] $oldTemplates */
             $oldTemplates = $tvObject->getMany('TemplateVarTemplates');
 
-            foreach($oldTemplates as $oldTemplate){
-                $oldTemplate->remove();
-            }
+//            $timer = number_format(round(microtime(true) - $tstart, 7), 7);
+//            $this->modx->log(modX::LOG_LEVEL_ERROR, $timer);
 
             $tvObject->setProperties($tv->getProperties());
             $tvObject->save();
 
+            // Compare list of old templates to new templates
+            $oldTemplateList = array();
+            foreach ($oldTemplates as $template) {
+                $oldTemplateList[] = $template->get('templateid');
+            }
+
+            $newTemplateList = array();
             $templates = $tv->getTemplates();
             if (!empty($templates)) {
-                $templates = $this->modx->getCollection('modTemplate', array('templatename:IN' => $tv->getTemplates()));
                 foreach ($templates as $template) {
-                    $templateTVObject = $this->modx->newObject('modTemplateVarTemplate');
-                    $templateTVObject->set('tmplvarid', $tvObject->id);
-                    $templateTVObject->set('templateid', $template->id);
-                    $templateTVObject->save();
+                    $newTemplateList[] = $templateList[$template];
+                }
+            }
+
+            $newTemplateList = array_filter($newTemplateList);
+            $addedTemplates = array_diff($newTemplateList, $oldTemplateList);
+            $removedTemplates = array_diff($oldTemplateList, $newTemplateList);
+
+//            $this->modx->log(modX::LOG_LEVEL_ERROR, 'Added templates: ' . print_r($addedTemplates,1));
+//            $this->modx->log(modX::LOG_LEVEL_ERROR, 'Removed templates: ' . print_r($removedTemplates,1));
+
+            foreach ($addedTemplates as $template) {
+                $this->modx->log(modX::LOG_LEVEL_ERROR, 'Add template: ' . $template);
+                $templateTVObject = $this->modx->newObject('modTemplateVarTemplate');
+                $templateTVObject->set('tmplvarid', $tvObject->id);
+                $templateTVObject->set('templateid', $template);
+                $templateTVObject->save();
+            }
+            foreach ($removedTemplates as $template) {
+                foreach ($oldTemplates as $oldTemplate) {
+                    if ($oldTemplate->get('templateid') === $template) {
+                        $this->modx->log(modX::LOG_LEVEL_ERROR, 'Remove template: ' . $template);
+                        $oldTemplate->remove();
+                    }
                 }
             }
 
             if(isset($notUsedElements[$name])){
                 unset($notUsedElements[$name]);
             }
+
+//            $timer = number_format(round(microtime(true) - $tstart, 7), 7);
+//            $this->modx->log(modX::LOG_LEVEL_ERROR, $timer);
         }
 
         foreach($notUsedElements as $name => $value){
@@ -453,6 +499,9 @@ class GitPackageManagementUpdatePackageProcessor extends modObjectUpdateProcesso
                 $tv->remove();
             }
         }
+
+//        $totalEnd = number_format(round(microtime(true) - $total, 7), 7);
+//        $this->modx->log(modX::LOG_LEVEL_ERROR, $totalEnd);
 
         return true;
     }
