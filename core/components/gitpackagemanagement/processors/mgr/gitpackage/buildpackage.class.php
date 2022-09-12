@@ -148,12 +148,14 @@ class GitPackageManagementBuildPackageProcessor extends modObjectProcessor {
 
         $extensionPackage = $this->config->getExtensionPackage();
         if ($extensionPackage !== false) {
-            $prefix = $db->getPrefix();
-
             if (!is_array($extensionPackage)) $extensionPackage = array();
 
-            if (isset($prefix)) {
-                $extensionPackage['tablePrefix'] = $prefix;
+            if ($db != null) {
+                $prefix = $db->getPrefix();
+
+                if (isset($prefix)) {
+                    $extensionPackage['tablePrefix'] = $prefix;
+                }
             }
 
             $vehicle->addExtensionPackageResolver($this->packagePath . '_build/gpm_resolvers', $extensionPackage);
