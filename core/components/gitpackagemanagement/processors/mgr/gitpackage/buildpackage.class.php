@@ -184,6 +184,14 @@ class GitPackageManagementBuildPackageProcessor extends modObjectProcessor {
             $vehicle->addPHPResolver($resolversDir . ltrim($script, '/'));
         }
 
+        // Don't include the vendor folder in the package (thanks @Jako for this part)
+        $useComposer = $this->modx->getOption('composer', $this->config->getBuild()->getBuildOptions(), false);
+        if ($useComposer) {
+            $vendorPath = $this->config->getPackagePath() . '/core/components/' . $this->config->getLowCaseName() . '/vendor/';
+            $tempVendorPath = $this->config->getPackagePath() . '/temp_vendor/';
+            rename($vendorPath, $tempVendorPath);
+        }
+
         $this->builder->putVehicle($vehicle);
         $this->addMenus();
 
@@ -226,6 +234,11 @@ class GitPackageManagementBuildPackageProcessor extends modObjectProcessor {
         $this->builder->setPackageAttributes($packageAttributes);
 
         $this->builder->pack();
+
+        // Move the vendor folder back
+        if ($useComposer) {
+            rename($tempVendorPath, $vendorPath);
+        }
 
         return $this->success();
     }
