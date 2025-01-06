@@ -198,11 +198,12 @@ class GitPackageManagementCreateProcessor extends modObjectCreateProcessor {
             $modelPath = $this->packageCorePath . 'model/';
             $modelPath = str_replace('\\', '/', $modelPath);
 
-            $db = $this->config->getDatabase();
-            $prefix = $db->getPrefix();
+            if ($db = $this->config->getDatabase()){
+                $prefix = $db->getPrefix();
+            }
 
             if (!is_array($extPackage)) $extPackage = array();
-            
+
             if (isset($prefix)) {
                 $extPackage['tablePrefix'] = $prefix;
             }
