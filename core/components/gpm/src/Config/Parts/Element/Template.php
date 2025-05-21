@@ -19,7 +19,7 @@ class Template extends Element
     protected $_type = 'template';
 
     /** @var string */
-    protected $extension = 'html';
+    protected $extension = 'tpl';
 
     protected function prepareObject(int $category = null, bool $update = false, bool $static = true, bool $debug = false): modTemplate
     {
