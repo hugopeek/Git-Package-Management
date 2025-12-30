@@ -21,6 +21,7 @@ class PackageBuild extends Command {
     protected function configure(): void
     {
         $this
+            ->setName(self::$defaultName)
             ->setDescription('Build package without installing it')
             ->addArgument('dir', InputArgument::REQUIRED, 'Directory name where the new package is located')
         ;

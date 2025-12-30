@@ -12,6 +12,7 @@ class GPMInstall extends Command {
     protected function configure(): void
     {
         $this
+            ->setName(self::$defaultName)
             ->setDescription('Install GPM')
             ->setHelp('Installs GPM to the MDOX Revolution')
             ->addOption('dir', null, InputOption::VALUE_REQUIRED, 'Directory name where GPM is located', basename(dirname(dirname(dirname(dirname(dirname(__DIR__)))))))

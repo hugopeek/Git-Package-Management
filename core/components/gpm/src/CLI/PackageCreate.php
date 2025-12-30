@@ -25,6 +25,7 @@ class PackageCreate extends Command {
     protected function configure(): void
     {
         $this
+            ->setName(self::$defaultName)
             ->setDescription('Create new Package')
             ->addArgument('dir', InputArgument::REQUIRED, 'Directory name where the new package is located')
             ->addArgument('name', InputArgument::REQUIRED, 'Name of the package')

@@ -23,6 +23,7 @@ class PackageInstall extends Command {
     protected function configure(): void
     {
         $this
+            ->setName(self::$defaultName)
             ->setDescription('Install new Package')
             ->setHelp('Installs new package from given directory to MODX Revolution')
             ->addArgument('dir', InputArgument::REQUIRED, 'Directory name where the new package is located')

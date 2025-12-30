@@ -55,6 +55,27 @@ $fredExportBlueprints = $modx->services->get(\GPM\Operations\Fred\Export::class)
 
 $gpmUpdate = $modx->services->get(\GPM\Operations\GPM\Update::class);
 
+//set_error_handler(function($errno, $errstr, $errfile, $errline) {
+//    echo "ERROR [$errno]: $errstr in $errfile on line $errline\n";
+//    return false;
+//});
+//
+//register_shutdown_function(function() {
+//    $error = error_get_last();
+//    if ($error) {
+//        echo "FATAL ERROR: {$error['message']} in {$error['file']}:{$error['line']}\n";
+//    }
+//});
+//
+//try {
+//    $application->add(new \GPM\CLI\PackageInstall($install));
+//} catch (Throwable $e) {
+//    echo "EXCEPTION: " . $e->getMessage() . "\n";
+//    echo "Type: " . get_class($e) . "\n";
+//    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
+//    echo "Trace:\n" . $e->getTraceAsString() . "\n";
+//}
+
 // Commands
 $application->add(new \GPM\CLI\PackageInstall($install));
 $application->add(new \GPM\CLI\PackageBuild($build));
